@@ -29,7 +29,14 @@ export default function Footer() {
   const [selectedNamespace, setSelectedNamespace] = React.useState(
     NamespaceStore.getState().selectedNamespace
   );
-  NamespaceStore.subscribe(() => setSelectedNamespace(NamespaceStore.getState().selectedNamespace));
+  React.useEffect(() => {
+    const sub = NamespaceStore.subscribe(() =>
+      setSelectedNamespace(NamespaceStore.getState().selectedNamespace)
+    );
+    return () => {
+      sub();
+    };
+  }, []);
   return (
     <footer className="app-footer">
       <p className="selected-namespace">Namespace: {selectedNamespace}</p>
