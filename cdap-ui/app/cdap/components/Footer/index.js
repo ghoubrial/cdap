@@ -18,6 +18,7 @@ import React from 'react';
 import { Theme } from 'services/ThemeHelper';
 import If from '../If';
 import { objectQuery } from 'services/helpers';
+import NamespaceStore from 'services/NamespaceStore';
 require('./Footer.scss');
 
 export default function Footer() {
@@ -25,8 +26,13 @@ export default function Footer() {
   const footerUrl = Theme.footerLink;
   // 'project-id-30-characters-name1/instance-id-30-characters-name';
   const instanceMetadataId = objectQuery(window, 'CDAP_CONFIG', 'instanceMetadataId');
+  const [selectedNamespace, setSelectedNamespace] = React.useState(
+    NamespaceStore.getState().selectedNamespace
+  );
+  NamespaceStore.subscribe(() => setSelectedNamespace(NamespaceStore.getState().selectedNamespace));
   return (
     <footer className="app-footer">
+      <p className="selected-namespace">Namespace: {selectedNamespace}</p>
       <p className="text-center text-muted">
         <a href={footerUrl} target="_blank" rel="noopener noreferrer">
           {footerText}
