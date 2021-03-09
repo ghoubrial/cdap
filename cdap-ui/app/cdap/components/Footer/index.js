@@ -17,7 +17,7 @@
 import React from 'react';
 import { Theme } from 'services/ThemeHelper';
 import If from '../If';
-import { objectQuery } from 'services/helpers';
+import { isNilOrEmptyString, objectQuery } from 'services/helpers';
 import NamespaceStore from 'services/NamespaceStore';
 require('./Footer.scss');
 
@@ -33,8 +33,24 @@ export default function Footer() {
     const sub = NamespaceStore.subscribe(() =>
       setSelectedNamespace(NamespaceStore.getState().selectedNamespace)
     );
+    const mutationObserver = new MutationObserver((mutations) => {
+      if (!Array.isArray(mutations) || mutations.length === 0) {
+        return;
+      }
+      const title = objectQuery(mutations[0], 'target', 'textContent');
+      if (isNilOrEmptyString(title)) {
+        return;
+      }
+      const featureName = (objectQuery(title.split('|'), 1) || '').trim();
+      // For non-namespace pages: dashboard and admin.
+      if (featureName === 'Operations' || featureName === 'Namespace') {
+        setSelectedNamespace('--');
+      }
+    });
+    mutationObserver.observe(document.querySelector('title'), { childList: true, subtree: true });
     return () => {
       sub();
+      mutationObserver.disconnect();
     };
   }, []);
   return (
