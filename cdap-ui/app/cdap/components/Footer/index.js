@@ -18,21 +18,19 @@ import React from 'react';
 import { Theme } from 'services/ThemeHelper';
 import If from '../If';
 import { isNilOrEmptyString, objectQuery } from 'services/helpers';
+import { getCurrentNamespace } from 'services/NamespaceStore';
 import NamespaceStore from 'services/NamespaceStore';
 require('./Footer.scss');
 
+const nonNamespacePages = ['Operations', 'Namespace'];
 export default function Footer() {
   const footerText = Theme.footerText;
   const footerUrl = Theme.footerLink;
   // 'project-id-30-characters-name1/instance-id-30-characters-name';
   const instanceMetadataId = objectQuery(window, 'CDAP_CONFIG', 'instanceMetadataId');
-  const [selectedNamespace, setSelectedNamespace] = React.useState(
-    NamespaceStore.getState().selectedNamespace
-  );
+  const [selectedNamespace, setSelectedNamespace] = React.useState(getCurrentNamespace());
   React.useEffect(() => {
-    const sub = NamespaceStore.subscribe(() =>
-      setSelectedNamespace(NamespaceStore.getState().selectedNamespace)
-    );
+    const sub = NamespaceStore.subscribe(() => setSelectedNamespace(getCurrentNamespace()));
     const mutationObserver = new MutationObserver((mutations) => {
       if (!Array.isArray(mutations) || mutations.length === 0) {
         return;
@@ -42,8 +40,7 @@ export default function Footer() {
         return;
       }
       const featureName = (objectQuery(title.split('|'), 1) || '').trim();
-      // For non-namespace pages: dashboard and admin.
-      if (featureName === 'Operations' || featureName === 'Namespace') {
+      if (nonNamespacePages.indexOf(featureName) !== -1) {
         setSelectedNamespace('--');
       }
     });
