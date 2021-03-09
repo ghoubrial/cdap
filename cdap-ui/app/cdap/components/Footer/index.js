@@ -22,7 +22,7 @@ import { getCurrentNamespace } from 'services/NamespaceStore';
 import NamespaceStore from 'services/NamespaceStore';
 require('./Footer.scss');
 
-const nonNamespacePages = ['Operations', 'Namespace'];
+const nonNamespacePages = ['Operations', 'Reports', 'Administration'];
 export default function Footer() {
   const footerText = Theme.footerText;
   const footerUrl = Theme.footerLink;
@@ -40,6 +40,7 @@ export default function Footer() {
         return;
       }
       const featureName = (objectQuery(title.split('|'), 1) || '').trim();
+      console.log(featureName);
       if (nonNamespacePages.indexOf(featureName) !== -1) {
         setSelectedNamespace('--');
       }
