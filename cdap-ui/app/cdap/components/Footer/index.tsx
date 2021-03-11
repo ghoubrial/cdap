@@ -20,7 +20,48 @@ import If from '../If';
 import { isNilOrEmptyString, objectQuery } from 'services/helpers';
 import { getCurrentNamespace } from 'services/NamespaceStore';
 import NamespaceStore from 'services/NamespaceStore';
-require('./Footer.scss');
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles({
+  root: {
+    background: 'white',
+    color: '#cccccc',
+    fontSize: '11px',
+    fontWeight: 600,
+    zIndex: 0,
+    position: 'absolute',
+    width: '100%',
+    bottom: '0',
+    borderTop: 'solid 1px #cdcdcd',
+  },
+  footerText: {
+    height: '53px',
+    lineHeight: '53px',
+    margin: '0',
+    textAlign: 'center',
+  },
+  footerUrl: {
+    color: 'inherit',
+  },
+  instanceMetadataId: {
+    position: 'absolute',
+    top: '0',
+    right: '10px',
+    color: '#cccccc',
+    height: '53px',
+    lineHeight: '53px',
+    margin: '0',
+  },
+  selectedNamespace: {
+    position: 'absolute',
+    top: '0',
+    left: '10px',
+    color: '#cccccc',
+    height: '53px',
+    lineHeight: '53px',
+    margin: '0',
+  },
+});
 
 const nonNamespacePages = ['Operations', 'Reports', 'Administration'];
 export default function Footer() {
@@ -29,6 +70,7 @@ export default function Footer() {
   // 'project-id-30-characters-name1/instance-id-30-characters-name';
   const instanceMetadataId = objectQuery(window, 'CDAP_CONFIG', 'instanceMetadataId');
   const [selectedNamespace, setSelectedNamespace] = React.useState(getCurrentNamespace());
+  const classes = useStyles();
   React.useEffect(() => {
     const sub = NamespaceStore.subscribe(() => setSelectedNamespace(getCurrentNamespace()));
     const mutationObserver = new MutationObserver((mutations) => {
@@ -40,7 +82,6 @@ export default function Footer() {
         return;
       }
       const featureName = (objectQuery(title.split('|'), 1) || '').trim();
-      console.log(featureName);
       if (nonNamespacePages.indexOf(featureName) !== -1) {
         setSelectedNamespace('--');
       }
@@ -52,15 +93,15 @@ export default function Footer() {
     };
   }, []);
   return (
-    <footer className="app-footer">
-      <p className="selected-namespace">Namespace: {selectedNamespace}</p>
-      <p className="text-center text-muted">
-        <a href={footerUrl} target="_blank" rel="noopener noreferrer">
+    <footer className={classes.root}>
+      <p className={classes.selectedNamespace}>Namespace: {selectedNamespace}</p>
+      <p className={classes.footerText}>
+        <a href={footerUrl} target="_blank" rel="noopener noreferrer" className={classes.footerUrl}>
           {footerText}
         </a>
       </p>
       <If condition={instanceMetadataId}>
-        <p className="instance-metadata-id">Instance Id: {instanceMetadataId}</p>
+        <p className={classes.instanceMetadataId}>Instance Id: {instanceMetadataId}</p>
       </If>
     </footer>
   );
