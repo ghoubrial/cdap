@@ -16,7 +16,7 @@
 
 import React from 'react';
 import { Theme } from 'services/ThemeHelper';
-import If from '../If';
+import If from 'components/If';
 import { objectQuery } from 'services/helpers';
 import NamespaceStore, { getCurrentNamespace } from 'services/NamespaceStore';
 import { makeStyles } from '@material-ui/core/styles';
