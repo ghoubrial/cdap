@@ -17,9 +17,8 @@
 import React from 'react';
 import { Theme } from 'services/ThemeHelper';
 import If from '../If';
-import { isNilOrEmptyString, objectQuery } from 'services/helpers';
-import { getCurrentNamespace } from 'services/NamespaceStore';
-import NamespaceStore from 'services/NamespaceStore';
+import { objectQuery } from 'services/helpers';
+import NamespaceStore, { getCurrentNamespace } from 'services/NamespaceStore';
 import { makeStyles } from '@material-ui/core/styles';
 import PageTitleStore, { getCurrentPageTitle } from 'services/PageTitleStore/PageTitleStore';
 
