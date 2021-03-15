@@ -21,11 +21,12 @@ import { isNilOrEmptyString, objectQuery } from 'services/helpers';
 import { getCurrentNamespace } from 'services/NamespaceStore';
 import NamespaceStore from 'services/NamespaceStore';
 import { makeStyles } from '@material-ui/core/styles';
+import PageTitleStore, { getCurrentPageTitle } from 'services/PageTitleStore/PageTitleStore';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   root: {
     background: 'white',
-    color: '#cccccc',
+    color: theme.palette.grey[900],
     fontSize: '11px',
     fontWeight: 600,
     zIndex: 0,
@@ -47,7 +48,7 @@ const useStyles = makeStyles({
     position: 'absolute',
     top: '0',
     right: '10px',
-    color: '#cccccc',
+    color: theme.palette.grey[900],
     height: '53px',
     lineHeight: '53px',
     margin: '0',
@@ -56,40 +57,35 @@ const useStyles = makeStyles({
     position: 'absolute',
     top: '0',
     left: '10px',
-    color: '#cccccc',
+    color: theme.palette.grey[900],
     height: '53px',
     lineHeight: '53px',
     margin: '0',
   },
-});
+}));
 
 const nonNamespacePages = ['Operations', 'Reports', 'Administration'];
-export default function Footer() {
+export default function Footer(props) {
   const footerText = Theme.footerText;
   const footerUrl = Theme.footerLink;
   // 'project-id-30-characters-name1/instance-id-30-characters-name';
   const instanceMetadataId = objectQuery(window, 'CDAP_CONFIG', 'instanceMetadataId');
   const [selectedNamespace, setSelectedNamespace] = React.useState(getCurrentNamespace());
-  const classes = useStyles();
+  const classes = useStyles(props);
   React.useEffect(() => {
-    const sub = NamespaceStore.subscribe(() => setSelectedNamespace(getCurrentNamespace()));
-    const mutationObserver = new MutationObserver((mutations) => {
-      if (!Array.isArray(mutations) || mutations.length === 0) {
-        return;
-      }
-      const title = objectQuery(mutations[0], 'target', 'textContent');
-      if (isNilOrEmptyString(title)) {
-        return;
-      }
+    const namespaceSub = NamespaceStore.subscribe(() =>
+      setSelectedNamespace(getCurrentNamespace())
+    );
+    const titleSub = PageTitleStore.subscribe(() => {
+      const title = getCurrentPageTitle();
       const featureName = (objectQuery(title.split('|'), 1) || '').trim();
       if (nonNamespacePages.indexOf(featureName) !== -1) {
         setSelectedNamespace('--');
       }
     });
-    mutationObserver.observe(document.querySelector('title'), { childList: true, subtree: true });
     return () => {
-      sub();
-      mutationObserver.disconnect();
+      namespaceSub();
+      titleSub();
     };
   }, []);
   return (
